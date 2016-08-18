@@ -35,6 +35,13 @@ GULP.task('prod', function() {
 	GULP.watch('source/pre/fonts/**/*', ['fonts']);
 });
 
+GULP.task('wp', function() {
+	GULP.watch('source/pre/sass/**/*.sass', ['sass-wp']);
+	GULP.watch('source/pre/js/**/*.js', ['js-wp']);
+	GULP.watch('source/pre/assets/**/*', ['imagemin-wp']);
+	GULP.watch('source/pre/fonts/**/*', ['fonts-wp']);
+});
+
 // SASS & CSS
 ///////////////////////////////////////////////
 
@@ -67,6 +74,18 @@ GULP.task('sass-prod', function() {
 		.pipe(GULP.dest('html/css'));
 });
 
+GULP.task('sass-wp', function() {
+	GULP.src('source/pre/sass/**/*.sass')
+		.pipe(SASS.sync().on('error', SASS.logError))
+		.pipe(PREFIXCSS())
+		.pipe(MINCSS({debug: true}, function(details) {
+            console.log(details.name + ': ' + details.stats.originalSize);
+            console.log(details.name + ': ' + details.stats.minifiedSize);
+        }))
+		.pipe(RENAME({suffix: '.min'}))
+		.pipe(GULP.dest('wordpress/wp-content/themes/new-theme/css'));
+});
+
 // JAVASCRIPT
 ///////////////////////////////////////////////
 
@@ -86,6 +105,14 @@ GULP.task('js-prod', function(){
 		.pipe(GULP.dest('html/js'));
 });
 
+GULP.task('js-wp', function(){
+	GULP.src(['source/js/**/*.js'])
+		.pipe(JSCONCAT('*.js'))
+		.pipe(JSUGLIFY())
+		.pipe(RENAME('app.min.js'))
+		.pipe(GULP.dest('wordpress/wp-content/themes/new-theme/js'));
+});
+
 // IMAGES
 ///////////////////////////////////////////////
 
@@ -103,6 +130,12 @@ GULP.task('imagemin-prod', function(){
 		.pipe(GULP.dest('html/assets/images/'));
 });
 
+GULP.task('imagemin-wp', function(){
+	GULP.src('source/pre/assets/images/**/*')
+		.pipe(IMAGEMIN())
+		.pipe(GULP.dest('wordpress/wp-content/themes/new-theme/assets'));
+});
+
 // FONTS
 ///////////////////////////////////////////////
 
@@ -112,4 +145,9 @@ GULP.task('fonts', function(){
 		.pipe(GULP.dest('source/_dev/fonts/**/*'))
 		.pipe(GULP.dest('source/_prod/fonts/**/*'))
 		.pipe(GULP.dest('html/assets/fonts/**/*'));
+});
+
+GULP.task('fonts-wp', function(){
+	GULP.src('source/pre/assets/fonts/**/*')
+		.pipe(GULP.dest('wordpress/wp-content/themes/new-theme/fonts/**/*'));
 });
