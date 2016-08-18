@@ -1,0 +1,104 @@
+///////////////////////////////////////////////
+// TYPOGRAPHY
+// =========================
+
+// Typography styling
+
+// font families
+////////////////////////////////////////////////
+
+=open-sans
+	font-family: 'Open Sans', sans-serif
+
+// headings
+////////////////////////////////////////////////
+
+p,
+li,
+span,
+pre,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6
+	-webkit-font-smoothing: antialiased
+	-moz-osx-font-smoothing: grayscale
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6
+	margin-top: 0
+	margin-bottom: $bsu
+
+h1
+	font-size: $h1-size
+	line-height: $h1-line
+
+h2
+	font-size: $h2-size
+	line-height: $h2-line
+
+h3
+	font-size: $h3-size
+	line-height: $h3-line
+
+h4
+	font-size: $h4-size
+	line-height: $h4-line
+
+p
+	font-size: $base-font-size
+	line-height: $base-line-height
+	margin-bottom: $bsu
+
+// anchors
+////////////////////////////////////////////////
+
+a
+	color: $green-lime
+	transition: color .4s ease-in-out
+
+	&:hover
+		color: $green-lime-light
+
+// listings
+////////////////////////////////////////////////
+
+ul
+	margin-bottom: 0
+
+ul,
+li
+	font-size: $base-font-size
+	line-height: $base-line-height
+	color: $grey
+	text-align: left
+
+// text align
+////////////////////////////////////////////////
+
+.left
+	text-align: left
+
+.center
+	text-align: center
+
+.right
+	text-align: right
+
+// font weight
+////////////////////////////////////////////////
+
+.light
+	font-weight: 100
+
+.normal
+	font-weight: 400
+
+.bold
+	font-weight: 700

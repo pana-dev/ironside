@@ -1,0 +1,15 @@
+{
+  "name": "ironside",
+  "version": "1.0.0",
+  "dependencies": {
+    "gulp": "*",
+    "gulp-watch": "*",
+    "gulp-rename": "*",
+    "gulp-sass": "*",
+    "gulp-clean-css": "*",
+    "gulp-autoprefixer": "*",
+    "gulp-uglify": "*",
+    "gulp-concat": "*",
+    "gulp-imagemin": "^3.0.1"
+  }
+}
