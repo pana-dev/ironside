@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "dependencies": {
     "gulp": "*",
-    "gulp-watch": "*",
+    "gulp-autoprefixer": "*",
+    "gulp-clean-css": "*",
+    "gulp-concat": "*",
+    "gulp-imagemin": "^3.1.1",
     "gulp-rename": "*",
     "gulp-sass": "*",
-    "gulp-clean-css": "*",
-    "gulp-autoprefixer": "*",
     "gulp-uglify": "*",
-    "gulp-concat": "*",
-    "gulp-imagemin": "^3.0.1"
+    "gulp-watch": "*"
   }
 }

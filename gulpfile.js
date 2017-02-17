@@ -9,34 +9,10 @@
 // --- Base Directories
 
 var baseDirectory = {
-    theme: 'theme',
-    js: 'js',
-    assets: 'assets',
-    development: 'html',
-    production: 'production'
+    source: '_source',
+    development: '_development',
+    production: '_production'
 };
-
-// --- Theme Directories
-
-var themeDirectory = {
-    sass: 'sass',
-    css: 'css',
-    views: 'views'
-};
-
-// --- JavaScript Directories
-
-var jsDirectory = {
-    views: 'views'
-}
-
-// --- Assets Directories
-
-var assetsDirectory = {
-    global: 'global',
-    views: 'views',
-    fonts: 'fonts'
-}
 
 // --- Development Directories
 
@@ -47,11 +23,46 @@ var developmentDirectory = {
     js: 'js'
 };
 
+// --- Production Directories
+
 var productionDirectory = {
     css: 'css',
     views: 'views',
     assets: 'assets',
     js: 'js'
+};
+
+// --- Source Directory
+
+var sourceDirectory = {
+    assets: 'assets',
+    theme: 'theme',
+    js: 'js'
+};
+
+// --- Theme Directories
+
+var themeDirectory = {
+    sass: 'sass',
+    vendors: 'vendors'
+};
+
+var sassDirectory = {
+    views: 'views'
+};
+
+// --- JavaScript Directories
+
+var jsDirectory = {
+    views: 'views'
+};
+
+// --- Assets Directories
+
+var assetsDirectory = {
+    global: 'global',
+    views: 'views',
+    fonts: 'fonts'
 };
 
 // ---
@@ -71,6 +82,10 @@ const PREFIXCSS = require('gulp-autoprefixer');
 const JSUGLIFY = require('gulp-uglify');
 const JSCONCAT = require('gulp-concat');
 
+// --- Assets
+
+const IMAGEMIN = require('gulp-imagemin');
+
 // --- Other
 
 const WATCH = require('gulp-watch');
@@ -83,18 +98,14 @@ const RENAME = require('gulp-rename');
 // --- Development
 
 GULP.task('dev', function() {
-    GULP.watch(baseDirectory.theme + '/' + themeDirectory.sass + '/**/*.sass', ['sass-dev']);
-    GULP.watch(baseDirectory.js + '/' + jsDirectory.views + '/**/*.js', ['js-dev']);
-    GULP.watch([baseDirectory.assets + '/**/*', '!' + baseDirectory.assets + '/' + assetsDirectory.fonts + '**/*'], ['imagemin']);
+    GULP.watch(baseDirectory.theme + '/' + themeDirectory.sass + '/**/*.sass', ['dev-sass']);
+    GULP.watch(baseDirectory.js + '/' + jsDirectory.views + '/**/*.js', ['dev-js']);
+    GULP.watch([baseDirectory.assets + '/**/*', '!' + baseDirectory.assets + '/' + assetsDirectory.fonts + '**/*'], ['dev-imagemin']);
 });
 
 // --- Production
 
-GULP.task('prod', function() {
-    GULP.watch(baseDirectory.theme + '/' + themeDirectory.sass + '/**/*.sass', ['sass-prod']);
-    GULP.watch(baseDirectory.js + '/' + jsDirectory.views + '/**/*.js', ['js-prod']);
-    GULP.watch([baseDirectory.assets + '/**/*', '!' + baseDirectory.assets + '/' + assetsDirectory.fonts + '**/*'], ['imagemin-prod']);
-});
+GULP.task('prod', ['prod-sass', 'prod-js', 'prod-imagemin']);
 
 // ---
 // Sub Tasks
@@ -102,19 +113,40 @@ GULP.task('prod', function() {
 
 // --- Development - SASS
 
-GULP.task('sass-dev', function() {
-    GULP.src('source/sass/**/*.sass')
+GULP.task('dev-sass', function() {
+    
+    // Global
+    
+    GULP.src(
+            [
+                baseDirectory.source + '/' + sourceDirectory.theme + '/' + themeDirectory.sass + '/**/*.sass',
+                '!' + baseDirectory.source + '/' + sourceDirectory.theme + '/' + themeDirectory.sass + '/' + sassDirectory.views + '/**/*.sass'
+            ]
+        )
         .pipe(SASS.sync().on('error', SASS.logError))
         .pipe(PREFIXCSS())
-        .pipe(GULP.dest('source/css'));
+        .pipe(GULP.dest(baseDirectory.development + '/' + developmentDirectory.css));
+
+    // Views
+
+    GULP.src(baseDirectory.source + '/' + sourceDirectory.theme + '/' + themeDirectory.sass + '/' + sassDirectory.views + '/**/*.sass')
+        .pipe(SASS.sync().on('error', SASS.logError))
+        .pipe(PREFIXCSS())
+        .pipe(GULP.dest(baseDirectory.development + '/' + developmentDirectory.views));
 });
 
 // --- Production - SASS
 
-GULP.task('sass-prod', function() {
-    GULP.src([baseDirectory.theme + '/' + themeDirectory.sass + '/**/*.sass', '!' +
-            baseDirectory.theme + '/' + themeDirectory.sass + '/' + themeDirectory.views + '/**/*.sass'
-        ])
+GULP.task('prod-sass', function() {
+
+    // Global
+
+    GULP.src(
+            [
+                baseDirectory.source + '/' + sourceDirectory.theme + '/' + themeDirectory.sass + '/**/*.sass',
+                '!' + baseDirectory.source + '/' + sourceDirectory.theme + '/' + themeDirectory.sass + '/' + sassDirectory.views + '/**/*.sass'
+            ]
+        )
         .pipe(SASS.sync().on('error', SASS.logError))
         .pipe(PREFIXCSS())
         .pipe(MINCSS({ debug: true }, function(details) {
@@ -124,7 +156,9 @@ GULP.task('sass-prod', function() {
         .pipe(RENAME({ suffix: '.min' }))
         .pipe(GULP.dest(baseDirectory.production + '/' + productionDirectory.css));
 
-    GULP.src(baseDirectory.theme + '/' + themeDirectory.sass + '/' + themeDirectory.views + '/**/*.sass')
+    // Views
+
+    GULP.src(baseDirectory.source + '/' + sourceDirectory.theme + '/' + themeDirectory.sass + '/' + sassDirectory.views + '/**/*.sass')
         .pipe(SASS.sync().on('error', SASS.logError))
         .pipe(PREFIXCSS())
         .pipe(MINCSS({ debug: true }, function(details) {
@@ -137,38 +171,69 @@ GULP.task('sass-prod', function() {
 
 // --- Development - JavaScript
 
-GULP.task('js-dev', function() {
-    GULP.src([baseDirectory.js + '/**/*.js', '!' + baseDirectory.js + '/' + jsDirectory.views + '**/*.js'])
+GULP.task('dev-js', function() {
+    GULP.src(
+            [
+                baseDirectory.source + '/' + sourceDirectory.js + '/**/*.js',
+                '!' + baseDirectory.source + '/' + sourceDirectory.js + '/' + jsDirectory.views + '/**/*.js'
+            ]
+        )
         .pipe(GULP.dest(baseDirectory.development + '/' + developmentDirectory.js));
 
-    GULP.src(baseDirectory.js + '/' + jsDirectory.views + '/**/*.js')
+    GULP.src(baseDirectory.source + '/' + sourceDirectory.js + '/' + jsDirectory.views + '/**/*.js')
         .pipe(GULP.dest(baseDirectory.development + '/' + developmentDirectory.views))
 });
 
 // --- Production - JavaScript
-GULP.task('js-prod', function() {
-    GULP.src(['source/js/**/*.js'])
+
+GULP.task('prod-js', function() {
+    GULP.src(
+            [
+                baseDirectory.source + '/' + sourceDirectory.js + '/**/*.js',
+                '!' + baseDirectory.source + '/' + sourceDirectory.js + '/' + jsDirectory.views + '/**/*.js'
+            ]
+        )
         .pipe(JSCONCAT('*.js'))
         .pipe(JSUGLIFY())
-        .pipe(RENAME('app.min.js'))
-        .pipe(GULP.dest('source/_prod/js'))
-        .pipe(GULP.dest('html/js'));
+        .pipe(RENAME('master.min.js'))
+        .pipe(GULP.dest(baseDirectory.production + '/' + productionDirectory.js));
+
+    GULP.src(baseDirectory.source + '/' + sourceDirectory.js + '/' + jsDirectory.views + '/**/*.js')
+        .pipe(JSUGLIFY())
+        .pipe(RENAME({ suffix: '.min' }))
+        .pipe(GULP.dest(baseDirectory.production + '/' + productionDirectory.views));
 });
 
 // --- Development - Images
 
-GULP.task('imagemin', function() {
-    GULP.src('source/pre/assets/images/**/*')
+GULP.task('dev-imagemin', function() {
+
+    // Global
+
+    GULP.src(baseDirectory.source + '/' + sourceDirectory.assets + '/' + assetsDirectory.global + '/**/*')
         .pipe(IMAGEMIN())
-        .pipe(GULP.dest('source/_dev/assets/'))
-        .pipe(GULP.dest('html/assets/images/'));
+        .pipe(GULP.dest(baseDirectory.development + '/' + developmentDirectory.assets + '/' + assetsDirectory.global));
+
+    // Views
+
+    GULP.src(baseDirectory.source + '/' + sourceDirectory.assets + '/' + assetsDirectory.views + '/**/*')
+        .pipe(IMAGEMIN())
+        .pipe(GULP.dest(baseDirectory.development + '/' + developmentDirectory.views));
 });
 
 // --- Production - Images
 
-GULP.task('imagemin-prod', function() {
-    GULP.src('source/pre/assets/images/**/*')
+GULP.task('prod-imagemin', function() {
+
+    // Global
+
+    GULP.src(baseDirectory.source + '/' + sourceDirectory.assets + '/' + assetsDirectory.global + '/**/*')
         .pipe(IMAGEMIN())
-        .pipe(GULP.dest('source/_prod/assets/'))
-        .pipe(GULP.dest('html/assets/images/'));
+        .pipe(GULP.dest(baseDirectory.production + '/' + productionDirectory.assets + '/' + assetsDirectory.global));
+
+    // Views
+    
+    GULP.src(baseDirectory.source + '/' + sourceDirectory.assets + '/' + assetsDirectory.views + '/**/*')
+        .pipe(IMAGEMIN())
+        .pipe(GULP.dest(baseDirectory.production + '/' + productionDirectory.views));
 });

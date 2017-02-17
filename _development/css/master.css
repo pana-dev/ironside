@@ -1,0 +1,158 @@
+* {
+  box-sizing: border-box; }
+
+html,
+body {
+  height: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
+  -webkit-overflow-scrolling: touch; }
+
+p,
+li,
+span,
+pre,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  margin-bottom: 30px; }
+
+h1 {
+  font-size: 70px;
+  line-height: 92px; }
+
+h2 {
+  font-size: 36px;
+  line-height: 1; }
+
+h3 {
+  font-size: 44px;
+  line-height: 1; }
+
+h4 {
+  font-size: 21px;
+  line-height: 30px; }
+
+p {
+  font-size: 16px;
+  line-height: 30px;
+  margin-bottom: 30px; }
+
+a {
+  -webkit-transition: color .4s ease-in-out;
+  transition: color .4s ease-in-out; }
+
+ul {
+  margin-bottom: 0; }
+
+ul,
+li {
+  font-size: 16px;
+  line-height: 30px;
+  text-align: left; }
+
+.left {
+  text-align: left; }
+
+.center {
+  text-align: center; }
+
+.right {
+  text-align: right; }
+
+.light {
+  font-weight: 100; }
+
+.normal {
+  font-weight: 400; }
+
+.bold {
+  font-weight: 700; }
+
+input,
+select {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 30px;
+  background: #fff;
+  border: 1px solid #eee;
+  font-size: 12px;
+  color: #666;
+  outline: 0; }
+  input:active, input:focus,
+  select:active,
+  select:focus {
+    border: 1px solid #16a085; }
+
+label {
+  display: block;
+  position: relative;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #16a085; }
+
+.container-small {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 15px; }
+
+.container {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 15px; }
+
+.container-large {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 1420px;
+  margin: 0 auto;
+  padding: 0 15px; }
+
+.block {
+  display: block;
+  position: relative;
+  margin-bottom: 30px;
+  background: #fff; }
+
+.block-row {
+  padding: 15px 0; }
+
+.btn {
+  display: inline;
+  position: relative;
+  margin-bottom: 30px;
+  padding: 15px 30px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-transition: all .3s ease-in-out;
+  transition: all .3s ease-in-out; }
+  .btn.btn-default {
+    color: #fff; }
