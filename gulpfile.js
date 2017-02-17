@@ -1,40 +1,106 @@
 ///////////////////////////////////////////////
-// NODE MODULES
+// Gulp Configuration
 // =========================
 
-// GULP
+// ---
+// Directories
+///////////////////////////////////////////////
+
+// --- Base Directories
+
+var baseDirectory = {
+    theme: 'theme',
+    js: 'js',
+    assets: 'assets',
+    development: 'html',
+    production: 'production'
+};
+
+// --- Theme Directories
+
+var themeDirectory = {
+    sass: 'sass',
+    css: 'css',
+    views: 'views'
+};
+
+// --- JavaScript Directories
+
+var jsDirectory = {
+    views: 'views'
+}
+
+// --- Assets Directories
+
+var assetsDirectory = {
+    global: 'global',
+    views: 'views',
+    fonts: 'fonts'
+}
+
+// --- Development Directories
+
+var developmentDirectory = {
+    css: 'css',
+    views: 'views',
+    assets: 'assets',
+    js: 'js'
+};
+
+var productionDirectory = {
+    css: 'css',
+    views: 'views',
+    assets: 'assets',
+    js: 'js'
+};
+
+// ---
+// Gulp Modules
+///////////////////////////////////////////////
+
 const GULP = require('gulp');
 
-// CSS
+// --- CSS
+
 const SASS = require('gulp-sass');
 const MINCSS = require('gulp-clean-css');
 const PREFIXCSS = require('gulp-autoprefixer');
 
-// JAVASCRIPT
+// --- JavaScript
+
 const JSUGLIFY = require('gulp-uglify');
 const JSCONCAT = require('gulp-concat');
 
-// OTHER
+// --- Other
+
 const WATCH = require('gulp-watch');
 const RENAME = require('gulp-rename');
 
+// ---
 // Main Tasks
 ///////////////////////////////////////////////
 
+// --- Development
+
 GULP.task('dev', function() {
-    GULP.watch('source/sass/**/*.sass', ['sass-dev']);
-    GULP.watch('source/js/**/*.js', ['js-dev']);
-    GULP.watch('source/assets/**/*', ['imagemin']);
+    GULP.watch(baseDirectory.theme + '/' + themeDirectory.sass + '/**/*.sass', ['sass-dev']);
+    GULP.watch(baseDirectory.js + '/' + jsDirectory.views + '/**/*.js', ['js-dev']);
+    GULP.watch([baseDirectory.assets + '/**/*', '!' + baseDirectory.assets + '/' + assetsDirectory.fonts + '**/*'], ['imagemin']);
 });
+
+// --- Production
 
 GULP.task('prod', function() {
-    GULP.watch('source/sass/**/*.sass', ['sass-prod']);
-    GULP.watch('source/js/**/*.js', ['js-prod']);
-    GULP.watch('source/assets/**/*', ['imagemin-prod']);
+    GULP.watch(baseDirectory.theme + '/' + themeDirectory.sass + '/**/*.sass', ['sass-prod']);
+    GULP.watch(baseDirectory.js + '/' + jsDirectory.views + '/**/*.js', ['js-prod']);
+    GULP.watch([baseDirectory.assets + '/**/*', '!' + baseDirectory.assets + '/' + assetsDirectory.fonts + '**/*'], ['imagemin-prod']);
 });
 
-// SASS & CSS
+// ---
+// Sub Tasks
 ///////////////////////////////////////////////
+
+// --- Development - SASS
 
 GULP.task('sass-dev', function() {
     GULP.src('source/sass/**/*.sass')
@@ -43,19 +109,12 @@ GULP.task('sass-dev', function() {
         .pipe(GULP.dest('source/css'));
 });
 
-GULP.task('sass-prod', function() {
-    GULP.src(['source/sass/**/*.sass', '!source/sass/views/**/*.sass'])
-        .pipe(SASS.sync().on('error', SASS.logError))
-        .pipe(PREFIXCSS())
-        .pipe(MINCSS({ debug: true }, function(details) {
-            console.log(details.name + ': ' + details.stats.originalSize);
-            console.log(details.name + ': ' + details.stats.minifiedSize);
-        }))
-        .pipe(RENAME({ suffix: '.min' }))
-        .pipe(GULP.dest('dist/css'))
-        .pipe(GULP.dest('html/css'));
+// --- Production - SASS
 
-    GULP.src('source/sass/views/**/*.sass')
+GULP.task('sass-prod', function() {
+    GULP.src([baseDirectory.theme + '/' + themeDirectory.sass + '/**/*.sass', '!' +
+            baseDirectory.theme + '/' + themeDirectory.sass + '/' + themeDirectory.views + '/**/*.sass'
+        ])
         .pipe(SASS.sync().on('error', SASS.logError))
         .pipe(PREFIXCSS())
         .pipe(MINCSS({ debug: true }, function(details) {
@@ -63,20 +122,30 @@ GULP.task('sass-prod', function() {
             console.log(details.name + ': ' + details.stats.minifiedSize);
         }))
         .pipe(RENAME({ suffix: '.min' }))
-        .pipe(GULP.dest('dist/views'))
-        .pipe(GULP.dest('html/views'));
+        .pipe(GULP.dest(baseDirectory.production + '/' + productionDirectory.css));
+
+    GULP.src(baseDirectory.theme + '/' + themeDirectory.sass + '/' + themeDirectory.views + '/**/*.sass')
+        .pipe(SASS.sync().on('error', SASS.logError))
+        .pipe(PREFIXCSS())
+        .pipe(MINCSS({ debug: true }, function(details) {
+            console.log(details.name + ': ' + details.stats.originalSize);
+            console.log(details.name + ': ' + details.stats.minifiedSize);
+        }))
+        .pipe(RENAME({ suffix: '.min' }))
+        .pipe(GULP.dest(baseDirectory.production + '/' + productionDirectory.views));
 });
 
-// JavaScript
-///////////////////////////////////////////////
+// --- Development - JavaScript
 
 GULP.task('js-dev', function() {
-    GULP.src(['source/pre/js/**/*.js'])
-        .pipe(JSCONCAT('app.min.js'))
-        .pipe(GULP.dest('source/post/js'))
-        .pipe(GULP.dest('source/_dev/js'));
+    GULP.src([baseDirectory.js + '/**/*.js', '!' + baseDirectory.js + '/' + jsDirectory.views + '**/*.js'])
+        .pipe(GULP.dest(baseDirectory.development + '/' + developmentDirectory.js));
+
+    GULP.src(baseDirectory.js + '/' + jsDirectory.views + '/**/*.js')
+        .pipe(GULP.dest(baseDirectory.development + '/' + developmentDirectory.views))
 });
 
+// --- Production - JavaScript
 GULP.task('js-prod', function() {
     GULP.src(['source/js/**/*.js'])
         .pipe(JSCONCAT('*.js'))
@@ -86,8 +155,7 @@ GULP.task('js-prod', function() {
         .pipe(GULP.dest('html/js'));
 });
 
-// Images
-///////////////////////////////////////////////
+// --- Development - Images
 
 GULP.task('imagemin', function() {
     GULP.src('source/pre/assets/images/**/*')
@@ -95,6 +163,8 @@ GULP.task('imagemin', function() {
         .pipe(GULP.dest('source/_dev/assets/'))
         .pipe(GULP.dest('html/assets/images/'));
 });
+
+// --- Production - Images
 
 GULP.task('imagemin-prod', function() {
     GULP.src('source/pre/assets/images/**/*')

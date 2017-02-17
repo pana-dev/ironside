@@ -1,0 +1,1 @@
+var master = "master js file";
